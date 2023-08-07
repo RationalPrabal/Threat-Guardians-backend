@@ -15,8 +15,8 @@ app.use(cors({
 }))
 
 app.use("/users",userRouter)
-app.use("/quizzes",quizRouter)
 app.use(authentication)
+app.use("/quizzes",quizRouter)
 app.use("/lectures",lectureRouter)
 
 app.listen(process.env.PORT,async()=>{

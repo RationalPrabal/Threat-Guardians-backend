@@ -19,7 +19,7 @@ res.send(quizs)
 
 quizRouter.post("/create",async(req,res)=>{
     try {
-        console.log(req.body)
+     
         let newquiz=new quizModel(req.body)
         await newquiz.save()
         res.send("quiz has been created")

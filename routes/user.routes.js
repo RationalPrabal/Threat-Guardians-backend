@@ -18,7 +18,16 @@ userRouter.get("/",async(req,res)=>{
         res.status(400).send("can't find users")
     }
 })
+//! get user by Id
 
+userRouter.get("/:id",async(req,res)=>{
+    try {
+        let user= await userModel.findById(req.params.id)
+       res.status(200).send(user)
+    } catch (error) {
+        res.status(400).send("can't find user")
+    }
+})
 //! registration
 
 userRouter.post("/register",async(req,res)=>{
@@ -49,6 +58,10 @@ userRouter.post("/login",async(req,res)=>{
     let email= req.body.email
     try{
 let user= await userModel.find({email})
+if(user[0].blocked){
+    res.status(403).send("Access Denied")
+    return
+}
 if(user.length){
     bcrypt.compare(req.body.password,user[0].password,(err,result)=>{
         if(err){
@@ -56,7 +69,7 @@ if(user.length){
         }
         if(result){
             const token= jwt.sign({user:user[0]._id},"masai")
-            res.send({"mes":"login success","token":token})
+            res.send({"mes":"login success","token":token,"user":user[0]})
         }
         else {
             res.status(401).send("Invalid password");
@@ -69,10 +82,20 @@ else {
 }
     }
     catch(e){
-        res.status(400).send(e.message)
+        res.status(400).send("can not login")
     }
 })
 
+//!patch user
+
+userRouter.patch("/update/:id",async(req,res)=>{
+    try {
+        await userModel.findByIdAndUpdate(req.params.id,req.body)
+        res.send("updation successful")
+    } catch (error) {
+        res.status(400).send("Could not update")
+    }
+})
 module.exports={
 userRouter
 }
